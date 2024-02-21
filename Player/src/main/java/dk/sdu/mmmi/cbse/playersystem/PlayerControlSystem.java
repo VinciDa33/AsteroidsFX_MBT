@@ -16,33 +16,41 @@ import static java.util.stream.Collectors.toList;
 public class PlayerControlSystem implements IEntityProcessingService {
 
     @Override
-    public void process(GameData gameData, World world, long delta) {
-            
+    public void process(GameData gameData, World world) {
+
         for (Entity player : world.getEntities(Player.class)) {
+
+            //Tick firing cooldown
+            ((Player) player).tickFireTimer(gameData.getDeltaSec());
+
+            //Controls
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
-                player.setRotation(player.getRotation() - 5);                
+                player.setRotation(player.getRotation() - player.getRotationSpeed() * gameData.getDeltaSec());
             }
             if (gameData.getKeys().isDown(GameKeys.RIGHT)) {
-                player.setRotation(player.getRotation() + 5);                
+                player.setRotation(player.getRotation() + player.getRotationSpeed() * gameData.getDeltaSec());
             }
             if (gameData.getKeys().isDown(GameKeys.UP)) {
                 double changeX = Math.cos(Math.toRadians(player.getRotation()));
                 double changeY = Math.sin(Math.toRadians(player.getRotation()));
-                player.setX(player.getX() + changeX);
-                player.setY(player.getY() + changeY);
+                player.setX(player.getX() + changeX * player.getSpeed() * gameData.getDeltaSec());
+                player.setY(player.getY() + changeY * player.getSpeed() * gameData.getDeltaSec());
             }
-            if (gameData.getKeys().isDown(GameKeys.SPACE)) {
+            if (gameData.getKeys().isDown(GameKeys.SPACE) && ((Player) player).canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> {world.addEntity(spi.createBullet(player, gameData, 200));}
+                        spi -> {
+                            world.addEntity(spi.createBullet(player, gameData, 200));
+                        }
                 );
             }
-            
+
+            //World border collision
             if (player.getX() < 0) {
                 player.setX(1);
             }
 
             if (player.getX() > gameData.getDisplayWidth()) {
-                player.setX(gameData.getDisplayWidth()-1);
+                player.setX(gameData.getDisplayWidth() - 1);
             }
 
             if (player.getY() < 0) {
@@ -50,10 +58,10 @@ public class PlayerControlSystem implements IEntityProcessingService {
             }
 
             if (player.getY() > gameData.getDisplayHeight()) {
-                player.setY(gameData.getDisplayHeight()-1);
+                player.setY(gameData.getDisplayHeight() - 1);
             }
-            
-                                        
+
+
         }
     }
 

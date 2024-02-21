@@ -9,5 +9,5 @@ import dk.sdu.mmmi.cbse.common.data.World;
  */
 public interface IPostEntityProcessingService {
 
-    void process(GameData gameData, World world, long delta);
+    void process(GameData gameData, World world);
 }

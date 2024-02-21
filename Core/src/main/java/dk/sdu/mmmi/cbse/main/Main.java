@@ -107,9 +107,12 @@ public class Main extends Application {
     }
 
     private void update(long delta) {
+
+        gameData.setDelta(delta);
+
         // Update
         for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
-            entityProcessorService.process(gameData, world, delta);
+            entityProcessorService.process(gameData, world);
         }
 //        for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
 //            postEntityProcessorService.process(gameData, world, delta);

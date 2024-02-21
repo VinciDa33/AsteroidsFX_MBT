@@ -7,6 +7,10 @@ public class GameData {
     private final GameKeys keys = new GameKeys();
 
 
+    private long delta;
+    private double deltaSec;
+
+
     public GameKeys getKeys() {
         return keys;
     }
@@ -27,5 +31,14 @@ public class GameData {
         return displayHeight;
     }
 
-
+    public void setDelta(long delta) {
+        this.delta = delta;
+        this.deltaSec = delta * 0.001f;
+    }
+    public long getDelta() {
+        return delta;
+    }
+    public double getDeltaSec() {
+        return deltaSec;
+    }
 }
