@@ -13,5 +13,5 @@ public interface IEntityProcessingService {
      * @param world
      * @throws
      */
-    void process(GameData gameData, World world);
+    void process(GameData gameData, World world, long delta);
 }
