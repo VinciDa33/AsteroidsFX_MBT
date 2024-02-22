@@ -23,6 +23,8 @@ public class PlayerPlugin implements IGamePluginService {
 
         Player playerShip = new Player();
         playerShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
+        playerShip.setColor(180, 220, 240);
+
         playerShip.setSpeed(140);
         playerShip.setRotationSpeed(250);
 

@@ -23,7 +23,10 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
     public Entity createBullet(Entity shooter, GameData gameData, double speed) {
         Entity bullet = new Bullet();
         bullet.setPolygonCoordinates(-2,-2,-2,2,2,2,2,-2);
+        bullet.setColor(shooter.getColor());
+
         bullet.setSpeed(speed);
+
         bullet.setX(shooter.getX());
         bullet.setY(shooter.getY());
         bullet.setRotation(shooter.getRotation());

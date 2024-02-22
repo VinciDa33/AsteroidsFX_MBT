@@ -13,6 +13,7 @@ public class Entity implements Serializable {
     private double rotation;
     private double speed;
     private double rotationSpeed;
+    private int[] rgb = new int[3];
             
 
     public String getID() {
@@ -59,4 +60,18 @@ public class Entity implements Serializable {
 
     public void setRotationSpeed(double rotationSpeed) {this.rotationSpeed = rotationSpeed;}
     public double getRotationSpeed() {return rotationSpeed;}
+
+    public void setColor(int r, int g, int b) {
+        rgb[0] = r;
+        rgb[1] = g;
+        rgb[2] = b;
+    }
+
+    public void setColor(int[] color) {
+        if (color.length == 3)
+            rgb = color;
+    }
+    public int[] getColor() {
+        return rgb;
+    }
 }
