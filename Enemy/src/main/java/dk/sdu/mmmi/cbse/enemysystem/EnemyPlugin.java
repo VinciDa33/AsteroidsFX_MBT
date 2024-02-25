@@ -2,6 +2,7 @@ package dk.sdu.mmmi.cbse.enemysystem;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
+import dk.sdu.mmmi.cbse.common.data.Vector;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.enemysystem.Enemy;
@@ -30,11 +31,10 @@ public class EnemyPlugin implements IGamePluginService {
         enemyShip.setSpeed(100);
         enemyShip.setRotationSpeed(220);
 
-        enemyShip.setActionCooldown(0.65f);
+        enemyShip.setVelocity(new Vector(0, 1));
         enemyShip.setFireCooldown(1f);
 
-        enemyShip.setX(gameData.getDisplayHeight()/3);
-        enemyShip.setY(gameData.getDisplayWidth()/3);
+        enemyShip.setPosition(gameData.getDisplaySize().divided(3d));
         return enemyShip;
     }
 

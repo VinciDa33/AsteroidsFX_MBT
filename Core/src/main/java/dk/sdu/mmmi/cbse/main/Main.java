@@ -38,7 +38,7 @@ public class Main extends Application {
     @Override
     public void start(Stage window) throws Exception {
         Text text = new Text(10, 20, "Destroyed asteroids: 0");
-        gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        gameWindow.setPrefSize(gameData.getDisplaySize().x, gameData.getDisplaySize().y);
         gameWindow.setStyle("-fx-background-color: #000000"); //Set background color
         gameWindow.getChildren().add(text);
 
@@ -137,8 +137,8 @@ public class Main extends Application {
                 polygons.put(entity, polygon);
                 gameWindow.getChildren().add(polygon);
             }
-            polygon.setTranslateX(entity.getX());
-            polygon.setTranslateY(entity.getY());
+            polygon.setTranslateX(entity.getPosition().x);
+            polygon.setTranslateY(entity.getPosition().y);
             polygon.setRotate(entity.getRotation());
 
             int[] color = entity.getColor();

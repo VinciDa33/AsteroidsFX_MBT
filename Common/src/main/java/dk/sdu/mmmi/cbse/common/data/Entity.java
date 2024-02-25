@@ -8,8 +8,8 @@ public class Entity implements Serializable {
     private final UUID ID = UUID.randomUUID();
     
     private double[] polygonCoordinates;
-    private double x;
-    private double y;
+    private Vector position;
+    private Vector velocity;
     private double rotation;
     private double speed;
     private double rotationSpeed;
@@ -31,21 +31,18 @@ public class Entity implements Serializable {
     }
        
 
-    public void setX(double x) {
-        this.x =x;
+    public void setPosition(Vector newPosition) {
+        position = newPosition;
+    }
+    public Vector getPosition() {
+        return position;
     }
 
-    public double getX() {
-        return x;
+    public void setVelocity(Vector newVelocity) {
+        velocity = newVelocity;
     }
-
-    
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getY() {
-        return y;
+    public Vector getVelocity() {
+        return velocity;
     }
 
     public void setRotation(double rotation) {

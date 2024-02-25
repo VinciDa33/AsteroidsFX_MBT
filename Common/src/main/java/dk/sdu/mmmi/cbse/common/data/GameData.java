@@ -4,6 +4,7 @@ public class GameData {
 
     private int displayWidth  = 800 ;
     private int displayHeight = 800;
+    private Vector displaySize = new Vector(800, 800);
     private final GameKeys keys = new GameKeys();
 
 
@@ -15,20 +16,11 @@ public class GameData {
         return keys;
     }
 
-    public void setDisplayWidth(int width) {
-        this.displayWidth = width;
+    public void setDisplaySize(Vector size) {
+        this.displaySize = size;
     }
-
-    public int getDisplayWidth() {
-        return displayWidth;
-    }
-
-    public void setDisplayHeight(int height) {
-        this.displayHeight = height;
-    }
-
-    public int getDisplayHeight() {
-        return displayHeight;
+    public Vector getDisplaySize() {
+        return displaySize;
     }
 
     public void setDelta(long delta) {

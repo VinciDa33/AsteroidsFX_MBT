@@ -2,6 +2,7 @@ package dk.sdu.mmmi.cbse.playersystem;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
+import dk.sdu.mmmi.cbse.common.data.Vector;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 public class PlayerPlugin implements IGamePluginService {
@@ -23,15 +24,15 @@ public class PlayerPlugin implements IGamePluginService {
 
         Player playerShip = new Player();
         playerShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
-        playerShip.setColor(180, 220, 240);
+        playerShip.setColor(140, 220, 240);
 
         playerShip.setSpeed(140);
+        playerShip.setVelocity(new Vector(1, 0));
         playerShip.setRotationSpeed(250);
 
         playerShip.setFireCooldown(0.5f);
 
-        playerShip.setX(gameData.getDisplayHeight()/2);
-        playerShip.setY(gameData.getDisplayWidth()/2);
+        playerShip.setPosition(gameData.getDisplaySize().divided(2d));
         return playerShip;
     }
 

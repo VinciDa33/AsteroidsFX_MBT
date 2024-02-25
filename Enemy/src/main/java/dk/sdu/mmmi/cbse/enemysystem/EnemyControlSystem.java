@@ -2,12 +2,10 @@ package dk.sdu.mmmi.cbse.enemysystem;
 
 
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.GameKeys;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.enemysystem.Enemy;
+import dk.sdu.mmmi.cbse.playersystem.Player;
 
 import java.util.Collection;
 import java.util.ServiceLoader;
@@ -20,48 +18,52 @@ public class EnemyControlSystem implements IEntityProcessingService {
     public void process(GameData gameData, World world) {
         for (Entity enemy : world.getEntities(Enemy.class)) {
 
-            //Tick action cooldown
-            ((Enemy) enemy).tickActionTimer(gameData.getDeltaSec());
+            //Tick cooldown
             ((Enemy) enemy).tickFireTimer(gameData.getDeltaSec());
 
-            if (((Enemy) enemy).canDoAction())
-                ((Enemy) enemy).setCurrentAction((int)Math.floor(Math.random() * 3f));
 
-            if (((Enemy) enemy).getCurrentAction() == 1)
-                enemy.setRotation(enemy.getRotation() - enemy.getRotationSpeed() * gameData.getDeltaSec());
-            else if (((Enemy) enemy).getCurrentAction() == 2)
-                enemy.setRotation(enemy.getRotation() + enemy.getRotationSpeed() * gameData.getDeltaSec());
+            //Movement
+            //Find player entity to track
+            Entity player = world.getEntities(Player.class).getFirst();
+            if (player != null) {
+                //Calculate vector between enemy and player
+                Vector deltaPosition = player.getPosition().subtracted(enemy.getPosition());
+                //Modify velocity using the delta vector and delta time to make the modification consistent across devices
+                //!CHANGE THE 2 TO A VARIABLE 'TURNING SPEED'
+                enemy.getVelocity().add(deltaPosition.normalized().multiplied(2 * gameData.getDeltaSec()));
+                //Normalize the velocity vector
+                enemy.getVelocity().normalize();
+            }
+            //Modify the position using the velocity vector, applying both speed and delta time
+            enemy.getPosition().add(enemy.getVelocity().multiplied(enemy.getSpeed() * gameData.getDeltaSec()));
 
-            //Move
-            double changeX = Math.cos(Math.toRadians(enemy.getRotation()));
-            double changeY = Math.sin(Math.toRadians(enemy.getRotation()));
-            enemy.setX(enemy.getX() + changeX * enemy.getSpeed() * gameData.getDeltaSec());
-            enemy.setY(enemy.getY() + changeY * enemy.getSpeed() * gameData.getDeltaSec());
+            //Set graphical rotation to match the direction of the velocity vector
+            enemy.setRotation(enemy.getVelocity().toAngle());
+
 
             //Fire bullets
             if (((Enemy) enemy).canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(enemy, gameData, 120))
+                        spi -> world.addEntity(spi.createBullet(enemy, gameData, 160, 4f))
                 );
             }
 
-            if (enemy.getX() < 0) {
-                enemy.setX(1);
+            //World border collision
+            if (enemy.getPosition().x < 0) {
+                enemy.getPosition().x = 0;
             }
 
-            if (enemy.getX() > gameData.getDisplayWidth()) {
-                enemy.setX(gameData.getDisplayWidth()-1);
+            if (enemy.getPosition().x > gameData.getDisplaySize().x) {
+                enemy.getPosition().x = gameData.getDisplaySize().x - 1;
             }
 
-            if (enemy.getY() < 0) {
-                enemy.setY(1);
+            if (enemy.getPosition().y < 0) {
+                enemy.getPosition().y = 0;
             }
 
-            if (enemy.getY() > gameData.getDisplayHeight()) {
-                enemy.setY(gameData.getDisplayHeight()-1);
+            if (enemy.getPosition().y > gameData.getDisplaySize().y) {
+                enemy.getPosition().y = gameData.getDisplaySize().y - 1;
             }
-
-
         }
     }
 
