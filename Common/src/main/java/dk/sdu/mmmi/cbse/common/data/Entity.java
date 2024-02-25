@@ -26,6 +26,9 @@ public class Entity implements Serializable {
         this.polygonCoordinates = coordinates;
     }
 
+    public void setPolygonArray(double[] arr) {
+        this.polygonCoordinates = arr;
+    }
     public double[] getPolygonCoordinates() {
         return polygonCoordinates;
     }
