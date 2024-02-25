@@ -108,7 +108,17 @@ public class Main extends Application {
 
     private void update(long delta) {
 
+        //Update delta time
         gameData.setDelta(delta);
+
+        //Deletion of flagged entities
+        for (Entity entity : world.getEntities()) {
+            if (entity.getDeletionFlag()) {
+                gameWindow.getChildren().remove(polygons.get(entity));
+                polygons.remove(entity);
+                world.removeEntity(entity);
+            }
+        }
 
         // Update
         for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {

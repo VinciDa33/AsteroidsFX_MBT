@@ -41,7 +41,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
             //Fire bullets
             if (((Enemy) enemy).canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> {world.addEntity(spi.createBullet(enemy, gameData, 120));}
+                        spi -> world.addEntity(spi.createBullet(enemy, gameData, 120))
                 );
             }
 

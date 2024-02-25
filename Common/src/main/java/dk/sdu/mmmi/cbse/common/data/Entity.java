@@ -14,7 +14,8 @@ public class Entity implements Serializable {
     private double speed;
     private double rotationSpeed;
     private int[] rgb = new int[3];
-            
+
+    private boolean deletionFlag = false;
 
     public String getID() {
         return ID.toString();
@@ -73,5 +74,12 @@ public class Entity implements Serializable {
     }
     public int[] getColor() {
         return rgb;
+    }
+
+    public void setDeletionFlag(boolean b) {
+        deletionFlag = b;
+    }
+    public boolean getDeletionFlag() {
+        return deletionFlag;
     }
 }
