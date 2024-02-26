@@ -28,8 +28,10 @@ public class EnemyPlugin implements IGamePluginService {
         enemyShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
         enemyShip.setColor(240, 100, 80);
 
+        enemyShip.setRadius(10f);
+
         enemyShip.setSpeed(100);
-        enemyShip.setRotationSpeed(220);
+        enemyShip.setRotationSpeed(2);
 
         enemyShip.setVelocity(new Vector(0, 1));
         enemyShip.setFireCooldown(1f);

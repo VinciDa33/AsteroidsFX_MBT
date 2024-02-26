@@ -1,3 +1,5 @@
+This is a personal implementation of the project for component based systems.
+
 Build the project from the root folder with the following Maven command:
 mvn clean install
 

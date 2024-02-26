@@ -6,15 +6,20 @@ import java.util.UUID;
 public class Entity implements Serializable {
 
     private final UUID ID = UUID.randomUUID();
-    
+
+    //Rendering
     private double[] polygonCoordinates;
+    private int[] rgb = new int[3];
+
+    //Movement
     private Vector position;
     private Vector velocity;
     private double rotation;
     private double speed;
     private double rotationSpeed;
-    private int[] rgb = new int[3];
 
+    //Utility
+    private double radius;
     private boolean deletionFlag = false;
 
     public String getID() {
@@ -81,5 +86,12 @@ public class Entity implements Serializable {
     }
     public boolean getDeletionFlag() {
         return deletionFlag;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+    public double getRadius() {
+        return radius;
     }
 }

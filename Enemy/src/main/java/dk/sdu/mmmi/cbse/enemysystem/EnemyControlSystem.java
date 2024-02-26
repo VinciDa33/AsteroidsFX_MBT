@@ -23,14 +23,13 @@ public class EnemyControlSystem implements IEntityProcessingService {
 
 
             //Movement
-            //Find player entity to track
+            //Find player entity to track !!!IMPORTANT!!! Enemy module is currently dependent on the player module, this should be fixed!
             Entity player = world.getEntities(Player.class).getFirst();
             if (player != null) {
                 //Calculate vector between enemy and player
                 Vector deltaPosition = player.getPosition().subtracted(enemy.getPosition());
                 //Modify velocity using the delta vector and delta time to make the modification consistent across devices
-                //!CHANGE THE 2 TO A VARIABLE 'TURNING SPEED'
-                enemy.getVelocity().add(deltaPosition.normalized().multiplied(2 * gameData.getDeltaSec()));
+                enemy.getVelocity().add(deltaPosition.normalized().multiplied(enemy.getRotationSpeed() * gameData.getDeltaSec()));
                 //Normalize the velocity vector
                 enemy.getVelocity().normalize();
             }

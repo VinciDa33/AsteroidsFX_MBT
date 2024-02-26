@@ -18,20 +18,23 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
     }
 
     @Override
-    public Entity createBullet(Entity shooter, GameData gameData, double speed, double size) {
+    public Entity createBullet(Entity shooter, GameData gameData, double speed, double radius) {
         Entity bullet = new Bullet();
+        ((Bullet) bullet).setShooter(shooter);
+
         bullet.setPolygonCoordinates(
-                0, 1 * size,
-                0.71 * size, 0.71 * size,
-                1 * size, 0,
-                0.71 * size, -0.71 * size,
-                0, -1 * size,
-                -0.71 * size, -0.71 * size,
-                -1 * size, 0,
-                -0.71 * size, 0.71 * size
+                0, 1 * radius,
+                0.71 * radius, 0.71 * radius,
+                1 * radius, 0,
+                0.71 * radius, -0.71 * radius,
+                0, -1 * radius,
+                -0.71 * radius, -0.71 * radius,
+                -1 * radius, 0,
+                -0.71 * radius, 0.71 * radius
         );
 
         bullet.setColor(shooter.getColor());
+        bullet.setRadius(radius);
 
         bullet.setSpeed(speed);
 
