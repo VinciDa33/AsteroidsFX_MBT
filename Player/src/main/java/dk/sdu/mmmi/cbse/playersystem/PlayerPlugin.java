@@ -23,13 +23,19 @@ public class PlayerPlugin implements IGamePluginService {
     private Entity createPlayerShip(GameData gameData) {
 
         Player playerShip = new Player();
-        playerShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
+        playerShip.setPolygonCoordinates(
+                7, 0,
+                -8, -6,
+                -5, 0,
+                -8, 6
+        );
+
         playerShip.setColor(140, 220, 240);
 
         playerShip.setRadius(6f);
 
         playerShip.setSpeed(140);
-        playerShip.setVelocity(new Vector(1, 0));
+        playerShip.setVelocity(new Vector(0, -1));
         playerShip.setRotationSpeed(250);
 
         playerShip.setFireCooldown(0.5f);

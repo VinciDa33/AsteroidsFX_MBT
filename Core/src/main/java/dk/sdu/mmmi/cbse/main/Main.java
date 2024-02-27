@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private final boolean showColliders = false;
+    private final boolean showColliders = true;
     private final GameData gameData = new GameData();
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
@@ -158,7 +158,7 @@ public class Main extends Application {
         Circle collider = colliders.get(entity);
         if (collider == null) {
             collider = new Circle(0, 0, entity.getRadius());
-            collider.setFill(javafx.scene.paint.Color.rgb(245, 220, 65, 0.5d));
+            collider.setFill(javafx.scene.paint.Color.rgb(130, 225, 245, 0.5d));
             colliders.put(entity, collider);
             gameWindow.getChildren().add(collider);
         }
