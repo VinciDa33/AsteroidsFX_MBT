@@ -13,7 +13,7 @@ public class AsteroidControlSystem implements IEntityProcessingService {
     private final int maxAsteroids = 5;
     @Override
     public void process(GameData gameData, World world) {
-        //!!! Test spawning of asteroids !!!
+        //!!!IMPORTANT!!! Test spawning of asteroids!
         if (world.getEntities(Asteroid.class).size() < maxAsteroids) {
             world.addEntity(createAsteroid(gameData, 40 + Math.random() * 80, 40f));
         }

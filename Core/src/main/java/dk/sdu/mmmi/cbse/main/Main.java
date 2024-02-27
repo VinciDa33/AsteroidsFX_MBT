@@ -19,15 +19,18 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private final boolean showColliders = false;
     private final GameData gameData = new GameData();
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
+    private final Map<Entity, Circle> colliders = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
 
 
@@ -115,7 +118,9 @@ public class Main extends Application {
         for (Entity entity : world.getEntities()) {
             if (entity.getDeletionFlag()) {
                 gameWindow.getChildren().remove(polygons.get(entity));
+                gameWindow.getChildren().remove(colliders.get(entity));
                 polygons.remove(entity);
+                colliders.remove(entity);
                 world.removeEntity(entity);
             }
         }
@@ -143,7 +148,23 @@ public class Main extends Application {
 
             int[] color = entity.getColor();
             polygon.setFill(javafx.scene.paint.Color.rgb(color[0], color[1], color[2]));
+
+            if (showColliders)
+                drawColliders(entity);
         }
+    }
+
+    private void drawColliders(Entity entity) {
+        Circle collider = colliders.get(entity);
+        if (collider == null) {
+            collider = new Circle(0, 0, entity.getRadius());
+            collider.setFill(javafx.scene.paint.Color.rgb(245, 220, 65, 0.5d));
+            colliders.put(entity, collider);
+            gameWindow.getChildren().add(collider);
+        }
+
+        collider.setTranslateX(entity.getPosition().x);
+        collider.setTranslateY(entity.getPosition().y);
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
