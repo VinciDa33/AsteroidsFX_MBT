@@ -3,9 +3,8 @@ package dk.sdu.mmmi.cbse.enemysystem;
 
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.player.Player;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
-import dk.sdu.mmmi.cbse.enemysystem.Enemy;
-import dk.sdu.mmmi.cbse.playersystem.Player;
 
 import java.util.Collection;
 import java.util.ServiceLoader;
@@ -23,16 +22,19 @@ public class EnemyControlSystem implements IEntityProcessingService {
 
 
             //Movement
-            //Find player entity to track !!!IMPORTANT!!! Enemy module is currently dependent on the player module, this should be fixed!
-            Entity player = world.getEntities(Player.class).getFirst();
+            //Find player entity to track
+            Entity player = null;
+            if (!world.getEntities(Player.class).isEmpty())
+                player = world.getEntities(Player.class).getFirst();
+
             if (player != null) {
                 //Calculate vector between enemy and player
-                Vector deltaPosition = player.getPosition().subtracted(enemy.getPosition());
-                //Modify velocity using the delta vector and delta time to make the modification consistent across devices
+                Vector deltaPosition = player.getPosition().subtracted(enemy.getPosition());//Modify velocity using the delta vector and delta time to make the modification consistent across devices
                 enemy.getVelocity().add(deltaPosition.normalized().multiplied(enemy.getRotationSpeed() * gameData.getDeltaSec()));
                 //Normalize the velocity vector
                 enemy.getVelocity().normalize();
             }
+
             //Modify the position using the velocity vector, applying both speed and delta time
             enemy.getPosition().add(enemy.getVelocity().multiplied(enemy.getSpeed() * gameData.getDeltaSec()));
 

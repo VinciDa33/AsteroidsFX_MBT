@@ -82,6 +82,11 @@ public class Vector {
         y = py;
     }
 
+    public void moveTowards(Vector target, double maxStep) {
+        Vector deltaVector = target.subtracted(this).normalized();
+        this.add(deltaVector.multiplied(maxStep));
+    }
+
     public double toAngle() {
         return Math.toDegrees(Math.atan2(y, x));
     }
