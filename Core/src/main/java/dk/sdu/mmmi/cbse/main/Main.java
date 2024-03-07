@@ -7,17 +7,21 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
-import java.util.Collection;
-import java.util.Map;
-import java.util.ServiceLoader;
+
+import java.lang.module.ModuleReference;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleDescriptor;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
@@ -26,15 +30,18 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private final boolean showColliders = true;
+    private final boolean showColliders = false;
     private final GameData gameData = new GameData();
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Map<Entity, Circle> colliders = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private static ModuleLayer pluginLayer;
 
 
     public static void main(String[] args) {
+        setupPluginModuleLayer();
+
         launch(Main.class);
     }
 
@@ -168,14 +175,40 @@ public class Main extends Application {
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
-        return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+        return ServiceLoader.load(pluginLayer, IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
     private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
-        return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+        return ServiceLoader.load(pluginLayer, IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
     private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
-        return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+        return ServiceLoader.load(pluginLayer, IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    }
+
+    private static void setupPluginModuleLayer() {
+        Path pluginsDir = Paths.get("plugins"); // Directory with plugins JARs
+
+        // Search for plugins in the plugins directory
+        ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
+
+        // Create list of all found plugin modules
+        List<String> plugins = pluginsFinder
+                .findAll()
+                .stream()
+                .map(ModuleReference::descriptor)
+                .map(ModuleDescriptor::name)
+                .collect(Collectors.toList());
+
+        // Create configuration
+        Configuration pluginsConfiguration = ModuleLayer
+                .boot()
+                .configuration()
+                .resolve(pluginsFinder, ModuleFinder.of(), plugins);
+
+        // Create module layer
+        pluginLayer = ModuleLayer
+                .boot()
+                .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
     }
 }

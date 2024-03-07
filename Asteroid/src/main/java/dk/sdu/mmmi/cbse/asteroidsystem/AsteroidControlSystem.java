@@ -58,8 +58,11 @@ public class AsteroidControlSystem implements IEntityProcessingService {
 
         //Generating circles, and offsetting vertices to create rock shapes
         double theta = Math.toRadians(360f / vertexCount);
+        double smallestRadius = Integer.MAX_VALUE;
         for (int i = 0; i < vertexCount; i++) {
-            double randomOffset = radius + rand.nextDouble(-radius * 0.2f, radius * 0.2f);
+            double randomOffset = radius + rand.nextDouble(-radius * 0.1f, radius * 0.1f);
+            smallestRadius = Math.min(randomOffset, smallestRadius);
+
             vertexArray[i*2] = Math.cos(theta * (i+1)) * randomOffset;
             vertexArray[i*2+1] = Math.sin(theta * (i+1)) * randomOffset;
         }
@@ -70,7 +73,7 @@ public class AsteroidControlSystem implements IEntityProcessingService {
         asteroid.setColor(250, 250, 250);
         asteroid.setSpeed(speed);
         asteroid.setRotation(Math.random() * 360f);
-        asteroid.setRadius(radius);
+        asteroid.setRadius(smallestRadius);
         //endregion
 
         //region Asteroid rotation
