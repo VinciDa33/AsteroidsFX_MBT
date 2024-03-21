@@ -7,6 +7,12 @@ public class RenderingSegment implements EntitySegment{
     private double[] polygonCoordinates;
     private int[] rgb = new int[3];
 
+    public RenderingSegment() {
+        rgb[0] = 255;
+        rgb[1] = 255;
+        rgb[2] = 255;
+    }
+
     public void setPolygonCoordinates(double... coordinates ) {
         this.polygonCoordinates = coordinates;
     }

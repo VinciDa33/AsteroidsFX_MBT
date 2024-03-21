@@ -1,9 +1,10 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.Vector;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.entitysegments.CircleColliderSegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.RenderingSegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.ShootingSegment;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 public class EnemyPlugin implements IGamePluginService {
@@ -22,32 +23,42 @@ public class EnemyPlugin implements IGamePluginService {
     private Entity createEnemyShip(GameData gameData) {
 
         Enemy enemyShip = new Enemy();
-        enemyShip.setPolygonCoordinates(
+        enemyShip.setTag(EntityTag.ENEMY);
+
+        //Rendering
+        RenderingSegment renderer = new RenderingSegment();
+        renderer.setPolygonCoordinates(
                 11, 0,
                 -8, -7,
                 -6, 0,
                 -8, 7
         );
+        renderer.setColor(240, 100, 80);
+        enemyShip.addSegment(renderer);
 
-        enemyShip.setColor(240, 100, 80);
+        //Collider
+        CircleColliderSegment collider = new CircleColliderSegment();
+        collider.setRadius(10f);
+        enemyShip.addSegment(collider);
 
-        enemyShip.setRadius(10f);
+        //Rigidbody
+        RigidbodySegment rigidbody = new RigidbodySegment();
+        rigidbody.setPosition(gameData.getDisplaySize().divided(3d));
+        rigidbody.setVelocity(new Vector(0, 100));
+        rigidbody.setRotationSpeed(2);
+        rigidbody.setRotationLock(true);
+        enemyShip.addSegment(rigidbody);
 
-        enemyShip.setSpeed(100);
-        enemyShip.setRotationSpeed(2);
+        //Shooting
+        ShootingSegment shooting = new ShootingSegment();
+        shooting.setFireCooldown(1f);
+        enemyShip.addSegment(shooting);
 
-        enemyShip.setVelocity(new Vector(0, 1));
-        enemyShip.setFireCooldown(1f);
-
-        enemyShip.setPosition(gameData.getDisplaySize().divided(3d));
         return enemyShip;
     }
 
     @Override
     public void stop(GameData gameData, World world) {
-        // Remove entities
-        for (Entity enemy : world.getEntities(Enemy.class)) {
-            enemy.setDeletionFlag(true);
-        }
+
     }
 }

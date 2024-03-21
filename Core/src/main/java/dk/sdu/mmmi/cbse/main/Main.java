@@ -4,6 +4,9 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.GameKeys;
 import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.entitysegments.CircleColliderSegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.RenderingSegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.TransformSegment;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
@@ -76,11 +79,13 @@ public class Main extends Application {
         for (IGamePluginService iGamePlugin : getPluginServices()) {
             iGamePlugin.start(gameData, world);
         }
+        /*
         for (Entity entity : world.getEntities()) {
             Polygon polygon = new Polygon(entity.getPolygonCoordinates());
             polygons.put(entity, polygon);
             gameWindow.getChildren().add(polygon);
         }
+         */
 
         render();
 
@@ -130,19 +135,32 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Entity must contain a RenderingSegment and a TransformSegment for the entity
+     * polygon to be rendered.
+     */
     private void draw() {
         for (Entity entity : world.getEntities()) {
+            if (entity.getSegment(RenderingSegment.class) == null)
+                continue;
+            if (entity.getSegment(TransformSegment.class) == null)
+                continue;
+
+            RenderingSegment render = entity.getSegment(RenderingSegment.class);
+            TransformSegment transform = entity.getSegment(TransformSegment.class);
+
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
-                polygon = new Polygon(entity.getPolygonCoordinates());
+                polygon = new Polygon(render.getPolygonCoordinates());
                 polygons.put(entity, polygon);
                 gameWindow.getChildren().add(polygon);
             }
-            polygon.setTranslateX(entity.getPosition().x);
-            polygon.setTranslateY(entity.getPosition().y);
-            polygon.setRotate(entity.getRotation());
 
-            int[] color = entity.getColor();
+            polygon.setTranslateX(transform.getPosition().x);
+            polygon.setTranslateY(transform.getPosition().y);
+            polygon.setRotate(transform.getRotation());
+
+            int[] color = render.getColor();
             polygon.setFill(javafx.scene.paint.Color.rgb(color[0], color[1], color[2]));
 
             if (showColliders)
@@ -150,17 +168,29 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * @param entity
+     * Entity must contain a CircleColliderSegment and a TransformSegment for the collision
+     * circle to be rendered.
+     * The check for a TransformSegment is done in the standard draw method.
+     */
     private void drawColliders(Entity entity) {
-        Circle collider = colliders.get(entity);
-        if (collider == null) {
-            collider = new Circle(0, 0, entity.getRadius());
-            collider.setFill(javafx.scene.paint.Color.rgb(130, 225, 245, 0.5d));
-            colliders.put(entity, collider);
-            gameWindow.getChildren().add(collider);
+        if (entity.getSegment(CircleColliderSegment.class) == null)
+            return;
+
+        CircleColliderSegment collider = entity.getSegment(CircleColliderSegment.class);
+        TransformSegment transform = entity.getSegment(TransformSegment.class);
+
+        Circle colliderGizmo = colliders.get(entity);
+        if (colliderGizmo == null) {
+            colliderGizmo = new Circle(0, 0, collider.getRadius());
+            colliderGizmo.setFill(javafx.scene.paint.Color.rgb(130, 225, 245, 0.5d));
+            colliders.put(entity, colliderGizmo);
+            gameWindow.getChildren().add(colliderGizmo);
         }
 
-        collider.setTranslateX(entity.getPosition().x);
-        collider.setTranslateY(entity.getPosition().y);
+        colliderGizmo.setTranslateX(transform.getPosition().x);
+        colliderGizmo.setTranslateY(transform.getPosition().y);
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {

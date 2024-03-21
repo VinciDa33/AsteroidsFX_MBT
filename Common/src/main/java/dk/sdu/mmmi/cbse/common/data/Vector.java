@@ -61,9 +61,9 @@ public class Vector {
         return new Vector(x / mag, y / mag);
     }
 
-    public double distance(Vector other) {
-        double dx = x - other.x;
-        double dy = y - other.y;
+    public static double distance(Vector v1, Vector v2) {
+        double dx = v1.x - v2.x;
+        double dy = v1.y - v2.y;
 
         return Math.sqrt(dx * dx + dy * dy);
     }
@@ -89,6 +89,13 @@ public class Vector {
 
     public double toAngle() {
         return Math.toDegrees(Math.atan2(y, x));
+    }
+
+    public static double dot(Vector v1, Vector v2) {
+        Vector vn1 = v1.normalized();
+        Vector vn2 = v2.normalized();
+
+        return vn1.x * vn2.x + vn1.y * vn2.y;
     }
 
     public Vector copy() {
