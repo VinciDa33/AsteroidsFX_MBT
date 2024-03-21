@@ -30,6 +30,7 @@ public class CircleColliderSegment implements EntitySegment{
 
     }
     public void doCollision(Entity other) {
-        collisionMap.get(other.getTag()).onCollision();
+        if (collisionMap.get(other.getTag()) != null)
+            collisionMap.get(other.getTag()).onCollision(other);
     }
 }

@@ -1,6 +1,7 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
 
+import dk.sdu.mmmi.cbse.common.bullet.BulletParams;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
@@ -27,12 +28,13 @@ public class EnemyControlSystem implements IEntityProcessingService {
             Entity player = null;
             List<Entity> playerEntities = world.getEntitiesWithTag(EntityTag.PLAYER);
             if (!playerEntities.isEmpty())
-                player = playerEntities.get(0);
+                player = playerEntities.getFirst();
 
             //Rotate towards player
             if (player != null) {
                 RigidbodySegment playerRigidbody = player.getSegment(RigidbodySegment.class);
-                if (Vector.dot(rigidbody.getPosition(), playerRigidbody.getPosition()) < 0)
+                double dot = Vector.dot(rigidbody.getVelocity().rotated(90d).normalized(), playerRigidbody.getPosition().subtracted(rigidbody.getPosition()));
+                if (dot < 0)
                     rigidbody.rotate(gameData, -1);
                 else
                     rigidbody.rotate(gameData, 1);
@@ -47,7 +49,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
             //Fire bullets
             if (shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(enemy, gameData, 160, 4f))
+                        spi -> world.addEntity(spi.createBullet(enemy, gameData, new BulletParams(rigidbody.getVelocity(),160d, 4d)))
                 );
             }
 

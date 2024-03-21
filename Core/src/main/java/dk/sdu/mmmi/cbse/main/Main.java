@@ -79,13 +79,6 @@ public class Main extends Application {
         for (IGamePluginService iGamePlugin : getPluginServices()) {
             iGamePlugin.start(gameData, world);
         }
-        /*
-        for (Entity entity : world.getEntities()) {
-            Polygon polygon = new Polygon(entity.getPolygonCoordinates());
-            polygons.put(entity, polygon);
-            gameWindow.getChildren().add(polygon);
-        }
-         */
 
         render();
 
@@ -143,8 +136,10 @@ public class Main extends Application {
         for (Entity entity : world.getEntities()) {
             if (entity.getSegment(RenderingSegment.class) == null)
                 continue;
-            if (entity.getSegment(TransformSegment.class) == null)
+            if (entity.getSegment(TransformSegment.class) == null) {
+                System.out.println("No transform");
                 continue;
+            }
 
             RenderingSegment render = entity.getSegment(RenderingSegment.class);
             TransformSegment transform = entity.getSegment(TransformSegment.class);

@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.playersystem;
 
+import dk.sdu.mmmi.cbse.common.bullet.BulletParams;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
@@ -41,7 +42,7 @@ public class PlayerControlSystem implements IEntityProcessingService {
 
             if (gameData.getKeys().isDown(GameKeys.SPACE) && shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(player, gameData, 240, 3))
+                        spi -> world.addEntity(spi.createBullet(player, gameData, new BulletParams(rigidbody.getVelocity(), 240d, 3d)))
                 );
             }
 

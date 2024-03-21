@@ -5,6 +5,7 @@ import dk.sdu.mmmi.cbse.common.entitysegments.CircleColliderSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.RenderingSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.ShootingSegment;
+import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 public class EnemyPlugin implements IGamePluginService {
@@ -39,13 +40,27 @@ public class EnemyPlugin implements IGamePluginService {
         //Collider
         CircleColliderSegment collider = new CircleColliderSegment();
         collider.setRadius(10f);
+
+        collider.addCollisionEvent(EntityTag.ASTEROID, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                enemyShip.setDeletionFlag(true);
+            }
+        });
+        collider.addCollisionEvent(EntityTag.BULLET, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                enemyShip.setDeletionFlag(true);
+            }
+        });
+
         enemyShip.addSegment(collider);
 
         //Rigidbody
-        RigidbodySegment rigidbody = new RigidbodySegment();
+        RigidbodySegment rigidbody = new RigidbodySegment(enemyShip);
         rigidbody.setPosition(gameData.getDisplaySize().divided(3d));
-        rigidbody.setVelocity(new Vector(0, 100));
-        rigidbody.setRotationSpeed(2);
+        rigidbody.setVelocity(new Vector(0, 80));
+        rigidbody.setRotationSpeed(80);
         rigidbody.setRotationLock(true);
         enemyShip.addSegment(rigidbody);
 

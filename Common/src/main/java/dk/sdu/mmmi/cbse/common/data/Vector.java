@@ -82,6 +82,18 @@ public class Vector {
         y = py;
     }
 
+    public Vector rotated(double angle) {
+        double theta = Math.toRadians(angle);
+
+        double cs = Math.cos(theta);
+        double sn = Math.sin(theta);
+
+        double px = x * cs - y * sn;
+        double py = x * sn + y * cs;
+
+        return new Vector(px, py);
+    }
+
     public void moveTowards(Vector target, double maxStep) {
         Vector deltaVector = target.subtracted(this).normalized();
         this.add(deltaVector.multiplied(maxStep));

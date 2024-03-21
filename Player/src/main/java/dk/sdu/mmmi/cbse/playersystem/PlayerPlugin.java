@@ -2,6 +2,7 @@ package dk.sdu.mmmi.cbse.playersystem;
 
 import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.*;
+import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 public class PlayerPlugin implements IGamePluginService {
 
@@ -35,10 +36,30 @@ public class PlayerPlugin implements IGamePluginService {
         //Collider
         CircleColliderSegment collider = new CircleColliderSegment();
         collider.setRadius(6f);
+
+        collider.addCollisionEvent(EntityTag.ASTEROID, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+        collider.addCollisionEvent(EntityTag.ENEMY, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+        collider.addCollisionEvent(EntityTag.BULLET, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+
         playerShip.addSegment(collider);
 
         //Rigidbody
-        RigidbodySegment rigidbody = new RigidbodySegment();
+        RigidbodySegment rigidbody = new RigidbodySegment(playerShip);
         rigidbody.setPosition(gameData.getDisplaySize().divided(2d));
         rigidbody.setVelocity(new Vector(0, -140));
         rigidbody.setRotationSpeed(250);

@@ -30,12 +30,12 @@ public class Entity implements Serializable {
         return ID.toString();
     }
 
-    public void addSegment(EntitySegment part) {
-        segments.put(part.getClass(), part);
+    public void addSegment(EntitySegment segment) {
+        segments.put(segment.getClass(), segment);
     }
 
-    public void removeSegment(Class partClass) {
-        segments.remove(partClass);
+    public void removeSegment(Class segmentClass) {
+        segments.remove(segmentClass);
     }
 
     public <E extends EntitySegment> E getSegment(Class segmentClass) {
