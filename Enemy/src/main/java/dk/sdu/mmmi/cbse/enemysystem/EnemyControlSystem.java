@@ -1,15 +1,15 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
 
+import dk.sdu.mmmi.cbse.common.bullet.BulletParams;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.GameKeys;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
+import dk.sdu.mmmi.cbse.common.entitysegments.ShootingSegment;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
-import dk.sdu.mmmi.cbse.enemysystem.Enemy;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import static java.util.stream.Collectors.toList;
@@ -20,48 +20,55 @@ public class EnemyControlSystem implements IEntityProcessingService {
     public void process(GameData gameData, World world) {
         for (Entity enemy : world.getEntities(Enemy.class)) {
 
-            //Tick action cooldown
-            ((Enemy) enemy).tickActionTimer(gameData.getDeltaSec());
-            ((Enemy) enemy).tickFireTimer(gameData.getDeltaSec());
+            RigidbodySegment rigidbody = enemy.getSegment(RigidbodySegment.class);
+            ShootingSegment shooting = enemy.getSegment(ShootingSegment.class);
 
-            if (((Enemy) enemy).canDoAction())
-                ((Enemy) enemy).setCurrentAction((int)Math.floor(Math.random() * 3f));
+            //Movement
+            //Find player entity to track
+            Entity player = null;
+            List<Entity> playerEntities = world.getEntitiesWithTag(EntityTag.PLAYER);
+            if (!playerEntities.isEmpty())
+                player = playerEntities.getFirst();
 
-            if (((Enemy) enemy).getCurrentAction() == 1)
-                enemy.setRotation(enemy.getRotation() - enemy.getRotationSpeed() * gameData.getDeltaSec());
-            else if (((Enemy) enemy).getCurrentAction() == 2)
-                enemy.setRotation(enemy.getRotation() + enemy.getRotationSpeed() * gameData.getDeltaSec());
+            //Rotate towards player
+            if (player != null) {
+                RigidbodySegment playerRigidbody = player.getSegment(RigidbodySegment.class);
+                double dot = Vector.dot(rigidbody.getVelocity().rotated(90d).normalized(), playerRigidbody.getPosition().subtracted(rigidbody.getPosition()));
+                if (dot < 0)
+                    rigidbody.rotate(gameData, -1);
+                else
+                    rigidbody.rotate(gameData, 1);
+            }
 
-            //Move
-            double changeX = Math.cos(Math.toRadians(enemy.getRotation()));
-            double changeY = Math.sin(Math.toRadians(enemy.getRotation()));
-            enemy.setX(enemy.getX() + changeX * enemy.getSpeed() * gameData.getDeltaSec());
-            enemy.setY(enemy.getY() + changeY * enemy.getSpeed() * gameData.getDeltaSec());
+            //Modify the position using the velocity vector, applying both speed and delta time
+            rigidbody.process(gameData, enemy);
+
+            //Process shooting timer
+            shooting.process(gameData, enemy);
 
             //Fire bullets
-            if (((Enemy) enemy).canFire()) {
+            if (shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(enemy, gameData, 120))
+                        spi -> world.addEntity(spi.createBullet(enemy, gameData, new BulletParams(rigidbody.getVelocity(),160d, 4d)))
                 );
             }
 
-            if (enemy.getX() < 0) {
-                enemy.setX(1);
+            //World border collision
+            if (rigidbody.getPosition().x < 0) {
+                rigidbody.getPosition().x = 0;
             }
 
-            if (enemy.getX() > gameData.getDisplayWidth()) {
-                enemy.setX(gameData.getDisplayWidth()-1);
+            if (rigidbody.getPosition().x > gameData.getDisplaySize().x) {
+                rigidbody.getPosition().x = gameData.getDisplaySize().x - 1;
             }
 
-            if (enemy.getY() < 0) {
-                enemy.setY(1);
+            if (rigidbody.getPosition().y < 0) {
+                rigidbody.getPosition().y = 0;
             }
 
-            if (enemy.getY() > gameData.getDisplayHeight()) {
-                enemy.setY(gameData.getDisplayHeight()-1);
+            if (rigidbody.getPosition().y > gameData.getDisplaySize().y) {
+                rigidbody.getPosition().y = gameData.getDisplaySize().y - 1;
             }
-
-
         }
     }
 

@@ -43,6 +43,15 @@ public class World {
         return r;
     }
 
+    public List<Entity> getEntitiesWithTag(EntityTag tag) {
+        List<Entity> r = new ArrayList<>();
+        for (String key : entityMap.keySet()) {
+            if (entityMap.get(key).getTag() == tag)
+                r.add(entityMap.get(key));
+        }
+        return r;
+    }
+
     public Entity getEntity(String ID) {
         return entityMap.get(ID);
     }

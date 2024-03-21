@@ -1,12 +1,10 @@
 package dk.sdu.mmmi.cbse.playersystem;
 
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.entitysegments.*;
+import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 public class PlayerPlugin implements IGamePluginService {
-
-    private Entity player;
 
     public PlayerPlugin() {
     }
@@ -15,30 +13,70 @@ public class PlayerPlugin implements IGamePluginService {
     public void start(GameData gameData, World world) {
 
         // Add entities to the world
-        player = createPlayerShip(gameData);
+        Entity player = createPlayerShip(gameData);
         world.addEntity(player);
     }
 
     private Entity createPlayerShip(GameData gameData) {
 
         Player playerShip = new Player();
-        playerShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
-        playerShip.setColor(180, 220, 240);
+        playerShip.setTag(EntityTag.PLAYER);
 
-        playerShip.setSpeed(140);
-        playerShip.setRotationSpeed(250);
+        //Rendering
+        RenderingSegment renderer = new RenderingSegment();
+        renderer.setPolygonCoordinates(
+                7, 0,
+                -8, -6,
+                -5, 0,
+                -8, 6
+        );
+        renderer.setColor(140, 220, 240);
+        playerShip.addSegment(renderer);
 
-        playerShip.setFireCooldown(0.5f);
+        //Collider
+        CircleColliderSegment collider = new CircleColliderSegment();
+        collider.setRadius(6f);
 
-        playerShip.setX(gameData.getDisplayHeight()/2);
-        playerShip.setY(gameData.getDisplayWidth()/2);
+        collider.addCollisionEvent(EntityTag.ASTEROID, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+        collider.addCollisionEvent(EntityTag.ENEMY, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+        collider.addCollisionEvent(EntityTag.BULLET, new CollisionEvent() {
+            @Override
+            public void onCollision(Entity other) {
+                playerShip.setDeletionFlag(true);
+            }
+        });
+
+        playerShip.addSegment(collider);
+
+        //Rigidbody
+        RigidbodySegment rigidbody = new RigidbodySegment(playerShip);
+        rigidbody.setPosition(gameData.getDisplaySize().divided(2d));
+        rigidbody.setVelocity(new Vector(0, -140));
+        rigidbody.setRotationSpeed(250);
+        rigidbody.setRotationLock(true);
+        playerShip.addSegment(rigidbody);
+
+        //Shooting
+        ShootingSegment shooting = new ShootingSegment();
+        shooting.setFireCooldown(0.5f);
+        playerShip.addSegment(shooting);
+
         return playerShip;
     }
 
     @Override
     public void stop(GameData gameData, World world) {
-        // Remove entities
-        world.removeEntity(player);
+
     }
 
 }
