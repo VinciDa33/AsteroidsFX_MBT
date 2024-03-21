@@ -1,84 +1,45 @@
 package dk.sdu.mmmi.cbse.common.data;
 
+import dk.sdu.mmmi.cbse.common.entitysegments.EntitySegment;
+
 import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Entity implements Serializable {
 
     private final UUID ID = UUID.randomUUID();
-
-    //Rendering
-    private double[] polygonCoordinates;
-    private int[] rgb = new int[3];
-
-    //Movement
-    private Vector position;
-    private Vector velocity;
-    private double rotation;
-    private double speed;
-    private double rotationSpeed;
-
-    //Utility
-    private double radius;
+    private EntityTag tag = EntityTag.UNTAGGED;
+    private Map<Class, EntitySegment> segments;
     private boolean deletionFlag = false;
+
+    public Entity() {
+        segments = new ConcurrentHashMap<>();
+    }
+
+    public void setTag(EntityTag tag) {
+        this.tag = tag;
+    }
+
+    public EntityTag getTag() {
+        return tag;
+    }
 
     public String getID() {
         return ID.toString();
     }
 
-
-    public void setPolygonCoordinates(double... coordinates ) {
-        this.polygonCoordinates = coordinates;
+    public void addSegment(EntitySegment part) {
+        segments.put(part.getClass(), part);
     }
 
-    public void setPolygonArray(double[] arr) {
-        this.polygonCoordinates = arr;
-    }
-    public double[] getPolygonCoordinates() {
-        return polygonCoordinates;
-    }
-       
-
-    public void setPosition(Vector newPosition) {
-        position = newPosition;
-    }
-    public Vector getPosition() {
-        return position;
+    public void removeSegment(Class partClass) {
+        segments.remove(partClass);
     }
 
-    public void setVelocity(Vector newVelocity) {
-        velocity = newVelocity;
-    }
-    public Vector getVelocity() {
-        return velocity;
-    }
-
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
-    }
-
-    public double getRotation() {
-        return rotation;
-    }
-
-    public void setSpeed(double speed) {this.speed = speed;}
-    public double getSpeed() {return speed;}
-
-    public void setRotationSpeed(double rotationSpeed) {this.rotationSpeed = rotationSpeed;}
-    public double getRotationSpeed() {return rotationSpeed;}
-
-    public void setColor(int r, int g, int b) {
-        rgb[0] = r;
-        rgb[1] = g;
-        rgb[2] = b;
-    }
-
-    public void setColor(int[] color) {
-        if (color.length == 3)
-            rgb = color;
-    }
-    public int[] getColor() {
-        return rgb;
+    public <E extends EntitySegment> E getSegment(Class segmentClass) {
+        return (E) segments.get(segmentClass);
     }
 
     public void setDeletionFlag(boolean b) {
@@ -86,12 +47,5 @@ public class Entity implements Serializable {
     }
     public boolean getDeletionFlag() {
         return deletionFlag;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-    public double getRadius() {
-        return radius;
     }
 }
