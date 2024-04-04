@@ -38,6 +38,10 @@ public class Entity implements Serializable {
         segments.remove(segmentClass);
     }
 
+    public boolean hasSegment(Class segmentClass) {
+        return segments.get(segmentClass) != null;
+    }
+
     public <E extends EntitySegment> E getSegment(Class segmentClass) {
         return (E) segments.get(segmentClass);
     }

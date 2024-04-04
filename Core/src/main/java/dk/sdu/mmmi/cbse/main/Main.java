@@ -134,12 +134,10 @@ public class Main extends Application {
      */
     private void draw() {
         for (Entity entity : world.getEntities()) {
-            if (entity.getSegment(RenderingSegment.class) == null)
+            if (!entity.hasSegment(RenderingSegment.class))
                 continue;
-            if (entity.getSegment(TransformSegment.class) == null) {
-                System.out.println("No transform");
+            if (!entity.hasSegment(TransformSegment.class))
                 continue;
-            }
 
             RenderingSegment render = entity.getSegment(RenderingSegment.class);
             TransformSegment transform = entity.getSegment(TransformSegment.class);
@@ -170,7 +168,7 @@ public class Main extends Application {
      * The check for a TransformSegment is done in the standard draw method.
      */
     private void drawColliders(Entity entity) {
-        if (entity.getSegment(CircleColliderSegment.class) == null)
+        if (!entity.hasSegment(CircleColliderSegment.class))
             return;
 
         CircleColliderSegment collider = entity.getSegment(CircleColliderSegment.class);

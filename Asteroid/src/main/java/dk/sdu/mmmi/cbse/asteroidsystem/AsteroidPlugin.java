@@ -7,7 +7,8 @@ import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 public class AsteroidPlugin implements IGamePluginService {
     @Override
     public void start(GameData gameData, World world) {
-
+        //Initialize singleton
+        AsteroidSplitter.instance().setWorld(world);
     }
 
     @Override

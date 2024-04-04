@@ -52,12 +52,20 @@ public class Vector {
 
     public void normalize() {
         double mag = magnitude();
+
+        if (mag == 0)
+            return;
+
         x /= mag;
         y /= mag;
     }
 
     public Vector normalized() {
         double mag = magnitude();
+
+        if (mag == 0)
+            return new Vector(0, 0);
+
         return new Vector(x / mag, y / mag);
     }
 

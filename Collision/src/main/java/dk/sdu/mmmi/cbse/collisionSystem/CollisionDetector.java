@@ -28,11 +28,6 @@ public class CollisionDetector implements IPostEntityProcessingService {
                 if (trans2 == null || coll2 == null)
                     continue;
 
-                if (entity1 instanceof Bullet && ((Bullet) entity1).getShooter().getID().equals(entity2.getID()))
-                    continue;
-                if (entity2 instanceof Bullet && ((Bullet) entity2).getShooter().getID().equals(entity1.getID()))
-                    continue;
-
                 if (this.checkCollision(trans1.getPosition(), coll1.getRadius(), trans2.getPosition(), coll2.getRadius())) {
                     coll1.doCollision(entity2);
                     coll2.doCollision(entity1);

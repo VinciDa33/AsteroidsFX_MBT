@@ -4,6 +4,7 @@ package dk.sdu.mmmi.cbse.enemysystem;
 import dk.sdu.mmmi.cbse.common.bullet.BulletParams;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.*;
+import dk.sdu.mmmi.cbse.common.entitysegments.OnScreenSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.ShootingSegment;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
@@ -16,12 +17,23 @@ import static java.util.stream.Collectors.toList;
 
 
 public class EnemyControlSystem implements IEntityProcessingService {
+
+
+
     @Override
     public void process(GameData gameData, World world) {
+
+        int maxEnemyCount = Math.min(1 + (int) Math.floor(gameData.getTime() / 35d), 4);
+        if (world.getEntities(Enemy.class).size() < maxEnemyCount) {
+            Enemy enemy = new EnemyFactory().createEnemy(gameData);
+            world.addEntity(enemy);
+        }
+
         for (Entity enemy : world.getEntities(Enemy.class)) {
 
             RigidbodySegment rigidbody = enemy.getSegment(RigidbodySegment.class);
             ShootingSegment shooting = enemy.getSegment(ShootingSegment.class);
+            OnScreenSegment oss = enemy.getSegment(OnScreenSegment.class);
 
             //Movement
             //Find player entity to track
@@ -47,27 +59,10 @@ public class EnemyControlSystem implements IEntityProcessingService {
             shooting.process(gameData, enemy);
 
             //Fire bullets
-            if (shooting.canFire()) {
+            if (oss.isOnScreen() && shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
                         spi -> world.addEntity(spi.createBullet(enemy, gameData, new BulletParams(rigidbody.getVelocity(),160d, 4d)))
                 );
-            }
-
-            //World border collision
-            if (rigidbody.getPosition().x < 0) {
-                rigidbody.getPosition().x = 0;
-            }
-
-            if (rigidbody.getPosition().x > gameData.getDisplaySize().x) {
-                rigidbody.getPosition().x = gameData.getDisplaySize().x - 1;
-            }
-
-            if (rigidbody.getPosition().y < 0) {
-                rigidbody.getPosition().y = 0;
-            }
-
-            if (rigidbody.getPosition().y > gameData.getDisplaySize().y) {
-                rigidbody.getPosition().y = gameData.getDisplaySize().y - 1;
             }
         }
     }

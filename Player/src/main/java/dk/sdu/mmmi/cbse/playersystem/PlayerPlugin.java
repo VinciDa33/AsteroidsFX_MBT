@@ -37,19 +37,7 @@ public class PlayerPlugin implements IGamePluginService {
         CircleColliderSegment collider = new CircleColliderSegment();
         collider.setRadius(6f);
 
-        collider.addCollisionEvent(EntityTag.ASTEROID, new CollisionEvent() {
-            @Override
-            public void onCollision(Entity other) {
-                playerShip.setDeletionFlag(true);
-            }
-        });
         collider.addCollisionEvent(EntityTag.ENEMY, new CollisionEvent() {
-            @Override
-            public void onCollision(Entity other) {
-                playerShip.setDeletionFlag(true);
-            }
-        });
-        collider.addCollisionEvent(EntityTag.BULLET, new CollisionEvent() {
             @Override
             public void onCollision(Entity other) {
                 playerShip.setDeletionFlag(true);
