@@ -19,12 +19,19 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.ConnectException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.net.http.HttpClient;
 public class Game {
     private final boolean showColliders = false;
     private final GameData gameData = new GameData();
@@ -122,6 +129,43 @@ public class Game {
     }
 
     private void update(long delta) {
+        if (gameData.getKeys().isPressed(GameKeys.SPACE)) {
+            try {
+                /* THIS WORKS
+                int amount = 5; // Amount value you want to send
+
+                // Constructing the URL with query parameter
+                String url = String.format("http://localhost:6060/score?amount=%d", amount);
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .build();
+
+                client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .thenApply(HttpResponse::body)
+                        .thenAccept(System.out::println)
+                        .join();
+
+                 */
+
+                /*
+                int amount = 5; // Amount value you want to send
+
+                // Constructing the URL with query parameter
+                String url = String.format("http://localhost:8080/score?amount=%d", amount);
+
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+                // Printing the response body
+                System.out.println("Response: " + response.getBody());
+                 */
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
 
         //Update delta time
         gameData.setDelta(delta);
@@ -141,7 +185,6 @@ public class Game {
             return;
 
         scoreText.setText("Score: " + gameData.getScore());
-        System.out.println(gameData.getTime());
         timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
     }
 
