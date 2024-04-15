@@ -1,9 +1,6 @@
 package dk.sdu.mmmi.cbse.asteroidsystem;
 
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.EntityTag;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.Vector;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.CircleColliderSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.OnScreenSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.RenderingSegment;
@@ -13,7 +10,7 @@ import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 import java.util.Random;
 
 public class AsteroidFactory {
-    public Asteroid createAsteroid(GameData gameData, int asteroidSize) {
+    public Asteroid createAsteroid(GameData gameData, World world, int asteroidSize) {
         Asteroid asteroid = new Asteroid();
         asteroid.setTag(EntityTag.ASTEROID);
 
@@ -75,7 +72,7 @@ public class AsteroidFactory {
                 if (!asteroid.isActive())
                     return;
 
-                other.setDeletionFlag(true);
+                world.removeEntity(other);
             }
         });
         collider.addCollisionEvent(EntityTag.BULLET, new CollisionEvent() {
@@ -83,9 +80,9 @@ public class AsteroidFactory {
             public void onCollision(Entity other) {
                 if (!asteroid.isActive())
                     return;
-                if (asteroid.getDeletionFlag())
-                    return;
 
+                //Smaller asteroids award more points
+                gameData.addScore((4 - asteroid.getAsteroidSize()) * 100);
                 AsteroidSplitter.instance().splitAsteroid(gameData, asteroid);
             }
         });

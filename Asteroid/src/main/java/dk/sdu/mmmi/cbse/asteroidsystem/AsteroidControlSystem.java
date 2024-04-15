@@ -16,7 +16,7 @@ public class AsteroidControlSystem implements IEntityProcessingService {
 
         //Spawn new asteroids
         if (world.getEntities(Asteroid.class).size() < maxAsteroidCount) {
-            Asteroid asteroid = new AsteroidFactory().createAsteroid(gameData, 3);
+            Asteroid asteroid = new AsteroidFactory().createAsteroid(gameData, world, 3);
             world.addEntity(asteroid);
         }
 

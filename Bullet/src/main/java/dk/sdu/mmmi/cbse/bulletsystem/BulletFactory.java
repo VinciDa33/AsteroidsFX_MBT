@@ -3,16 +3,13 @@ package dk.sdu.mmmi.cbse.bulletsystem;
 import dk.sdu.mmmi.cbse.common.bullet.Bullet;
 import dk.sdu.mmmi.cbse.common.bullet.BulletParams;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.EntityTag;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.Vector;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.*;
 import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 
 public class BulletFactory implements BulletSPI {
     @Override
-    public Entity createBullet(Entity shooter, GameData gameData, BulletParams params) {
+    public Entity createBullet(Entity shooter, GameData gameData, World world, BulletParams params) {
         TransformSegment shooterTransform = shooter.getSegment(TransformSegment.class);
         RenderingSegment shooterRenderer = shooter.getSegment(RenderingSegment.class);
 
@@ -51,14 +48,14 @@ public class BulletFactory implements BulletSPI {
                 if (((Bullet) bullet).getShooter().getTag() == EntityTag.PLAYER)
                     return;
 
-                other.setDeletionFlag(true);
-                bullet.setDeletionFlag(true);
+                world.removeEntity(other);
+                world.removeEntity(bullet);
             }
         });
         collider.addCollisionEvent(EntityTag.ASTEROID, new CollisionEvent() {
             @Override
             public void onCollision(Entity other) {
-                bullet.setDeletionFlag(true);
+                world.removeEntity(bullet);
             }
         });
         collider.addCollisionEvent(EntityTag.ENEMY, new CollisionEvent() {
@@ -68,8 +65,10 @@ public class BulletFactory implements BulletSPI {
                 if (((Bullet) bullet).getShooter().getTag() == EntityTag.ENEMY)
                     return;
 
-                other.setDeletionFlag(true);
-                bullet.setDeletionFlag(true);
+                gameData.addScore(500);
+
+                world.removeEntity(other);
+                world.removeEntity(bullet);
             }
         });
 

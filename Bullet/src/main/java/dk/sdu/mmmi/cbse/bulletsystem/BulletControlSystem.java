@@ -17,7 +17,7 @@ public class BulletControlSystem implements IEntityProcessingService {
 
             OnScreenSegment oss = bullet.getSegment(OnScreenSegment.class);
             if (!oss.isOnScreen())
-                bullet.setDeletionFlag(true);
+                world.removeEntity(bullet);
         }
     }
 }

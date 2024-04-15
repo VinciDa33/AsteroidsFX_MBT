@@ -13,11 +13,11 @@ public class PlayerPlugin implements IGamePluginService {
     public void start(GameData gameData, World world) {
 
         // Add entities to the world
-        Entity player = createPlayerShip(gameData);
+        Entity player = createPlayerShip(gameData, world);
         world.addEntity(player);
     }
 
-    private Entity createPlayerShip(GameData gameData) {
+    private Entity createPlayerShip(GameData gameData, World world) {
 
         Player playerShip = new Player();
         playerShip.setTag(EntityTag.PLAYER);
@@ -40,7 +40,7 @@ public class PlayerPlugin implements IGamePluginService {
         collider.addCollisionEvent(EntityTag.ENEMY, new CollisionEvent() {
             @Override
             public void onCollision(Entity other) {
-                playerShip.setDeletionFlag(true);
+                world.removeEntity(playerShip);
             }
         });
 

@@ -25,7 +25,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
 
         int maxEnemyCount = Math.min(1 + (int) Math.floor(gameData.getTime() / 35d), 4);
         if (world.getEntities(Enemy.class).size() < maxEnemyCount) {
-            Enemy enemy = new EnemyFactory().createEnemy(gameData);
+            Enemy enemy = new EnemyFactory().createEnemy(gameData, world);
             world.addEntity(enemy);
         }
 
@@ -61,7 +61,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
             //Fire bullets
             if (oss.isOnScreen() && shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(enemy, gameData, new BulletParams(rigidbody.getVelocity(),160d, 4d)))
+                        spi -> world.addEntity(spi.createBullet(enemy, gameData, world, new BulletParams(rigidbody.getVelocity(),160d, 4d)))
                 );
             }
         }

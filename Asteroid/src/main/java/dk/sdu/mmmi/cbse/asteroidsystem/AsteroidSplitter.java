@@ -25,7 +25,7 @@ public class AsteroidSplitter {
     }
 
     public void splitAsteroid(GameData gameData, Asteroid asteroid) {
-        asteroid.setDeletionFlag(true);
+        world.removeEntity(asteroid);
 
         //Do not split if asteroid is already the smallest size
         if (asteroid.getAsteroidSize() <= 1)
@@ -44,7 +44,7 @@ public class AsteroidSplitter {
     private Asteroid createAsteroidFragment(GameData gameData, Asteroid asteroid, Vector newDirection) {
         RigidbodySegment rigidbody = asteroid.getSegment(RigidbodySegment.class);
 
-        Asteroid asteroidFrag = new AsteroidFactory().createAsteroid(gameData, asteroid.getAsteroidSize() - 1);
+        Asteroid asteroidFrag = new AsteroidFactory().createAsteroid(gameData, world, asteroid.getAsteroidSize() - 1);
         asteroidFrag.setSpawnDelay(0d);
         asteroidFrag.setSpawnTimestamp(gameData.getTime());
 

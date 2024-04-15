@@ -42,7 +42,7 @@ public class PlayerControlSystem implements IEntityProcessingService {
 
             if (gameData.getKeys().isDown(GameKeys.SPACE) && shooting.canFire()) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> world.addEntity(spi.createBullet(player, gameData, new BulletParams(rigidbody.getVelocity(), 240d, 3d)))
+                        spi -> world.addEntity(spi.createBullet(player, gameData, world, new BulletParams(rigidbody.getVelocity(), 240d, 3d)))
                 );
             }
 

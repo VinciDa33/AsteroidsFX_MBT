@@ -1,16 +1,13 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
-import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.data.EntityTag;
-import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.data.Vector;
+import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.*;
 import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 
 import java.util.Random;
 
 public class EnemyFactory {
-    public Enemy createEnemy(GameData gameData) {
+    public Enemy createEnemy(GameData gameData, World world) {
         Enemy enemyShip = new Enemy();
         enemyShip.setTag(EntityTag.ENEMY);
 
@@ -39,7 +36,9 @@ public class EnemyFactory {
                 if (!oss.isOnScreen())
                     return;
 
-                enemyShip.setDeletionFlag(true);
+                gameData.addScore(500);
+
+                world.removeEntity(enemyShip);
             }
         });
 

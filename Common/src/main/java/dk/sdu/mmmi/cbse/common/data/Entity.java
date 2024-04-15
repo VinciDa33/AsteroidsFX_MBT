@@ -12,8 +12,6 @@ public class Entity implements Serializable {
     private final UUID ID = UUID.randomUUID();
     private EntityTag tag = EntityTag.UNTAGGED;
     private Map<Class, EntitySegment> segments;
-    private boolean deletionFlag = false;
-
     public Entity() {
         segments = new ConcurrentHashMap<>();
     }
@@ -44,12 +42,5 @@ public class Entity implements Serializable {
 
     public <E extends EntitySegment> E getSegment(Class segmentClass) {
         return (E) segments.get(segmentClass);
-    }
-
-    public void setDeletionFlag(boolean b) {
-        deletionFlag = b;
-    }
-    public boolean getDeletionFlag() {
-        return deletionFlag;
     }
 }
