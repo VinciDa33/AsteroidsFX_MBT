@@ -7,6 +7,10 @@ import dk.sdu.mmmi.cbse.common.entitysegments.RenderingSegment;
 import dk.sdu.mmmi.cbse.common.entitysegments.RigidbodySegment;
 import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Random;
 
 public class AsteroidFactory {
@@ -82,7 +86,21 @@ public class AsteroidFactory {
                     return;
 
                 //Smaller asteroids award more points
-                gameData.addScore((4 - asteroid.getAsteroidSize()) * 100);
+                int amount = (4 - asteroid.getAsteroidSize()) * 100;
+
+                //Handle score
+                String url = String.format("http://localhost:6060/update?amount=%d", amount);
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .build();
+
+                try {
+                    client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 AsteroidSplitter.instance().splitAsteroid(gameData, asteroid);
             }
         });

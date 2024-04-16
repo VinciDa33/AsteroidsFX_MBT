@@ -19,10 +19,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -105,6 +102,20 @@ public class Game {
             iGamePlugin.start(gameData, world);
         }
 
+        //Reset the score on game relaunch
+        String url = String.format("http://localhost:6060/reset");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        try {
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         render();
 
         window.setScene(scene);
@@ -129,44 +140,6 @@ public class Game {
     }
 
     private void update(long delta) {
-        if (gameData.getKeys().isPressed(GameKeys.SPACE)) {
-            try {
-                /* THIS WORKS
-                int amount = 5; // Amount value you want to send
-
-                // Constructing the URL with query parameter
-                String url = String.format("http://localhost:6060/score?amount=%d", amount);
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .build();
-
-                client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                        .thenApply(HttpResponse::body)
-                        .thenAccept(System.out::println)
-                        .join();
-
-                 */
-
-                /*
-                int amount = 5; // Amount value you want to send
-
-                // Constructing the URL with query parameter
-                String url = String.format("http://localhost:8080/score?amount=%d", amount);
-
-                RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-                // Printing the response body
-                System.out.println("Response: " + response.getBody());
-                 */
-
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-
         //Update delta time
         gameData.setDelta(delta);
 
@@ -184,7 +157,24 @@ public class Game {
         if (world.getEntitiesWithTag(EntityTag.PLAYER).isEmpty())
             return;
 
-        scoreText.setText("Score: " + gameData.getScore());
+        String url = String.format("http://localhost:6060/get");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        int scoreValue = -1;
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String responseBody = response.body();
+
+            scoreValue = Integer.parseInt(responseBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        scoreText.setText("Score: " + scoreValue);
         timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
     }
 

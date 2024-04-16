@@ -11,10 +11,6 @@ public class GameData {
     private long delta;
     private double deltaSec;
     private double time;
-
-
-    private int score;
-
     public GameKeys getKeys() {
         return keys;
     }
@@ -39,15 +35,5 @@ public class GameData {
     }
     public double getTime() {
         return time;
-    }
-
-    public int getScore() {
-        return score;
-    }
-    public void setScore(int score) {
-        this.score = score;
-    }
-    public void addScore(int amount) {
-        this.score += amount;
     }
 }

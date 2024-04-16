@@ -4,6 +4,10 @@ import dk.sdu.mmmi.cbse.common.data.*;
 import dk.sdu.mmmi.cbse.common.entitysegments.*;
 import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Random;
 
 public class EnemyFactory {
@@ -36,7 +40,18 @@ public class EnemyFactory {
                 if (!oss.isOnScreen())
                     return;
 
-                gameData.addScore(500);
+                //Handle score
+                String url = String.format("http://localhost:6060/update?amount=%d", 500);
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .build();
+
+                try {
+                    client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 world.removeEntity(enemyShip);
             }
