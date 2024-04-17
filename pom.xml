@@ -20,6 +20,7 @@
         <module>Asteroid</module>
         <module>Collision</module>
         <module>ScoringSystem</module>
+        <module>SplitPackage</module>
     </modules>
     <properties>
         <java>java</java>
