@@ -52,18 +52,26 @@ public class Vector {
 
     public void normalize() {
         double mag = magnitude();
+
+        if (mag == 0)
+            return;
+
         x /= mag;
         y /= mag;
     }
 
     public Vector normalized() {
         double mag = magnitude();
+
+        if (mag == 0)
+            return new Vector(0, 0);
+
         return new Vector(x / mag, y / mag);
     }
 
-    public double distance(Vector other) {
-        double dx = x - other.x;
-        double dy = y - other.y;
+    public static double distance(Vector v1, Vector v2) {
+        double dx = v1.x - v2.x;
+        double dy = v1.y - v2.y;
 
         return Math.sqrt(dx * dx + dy * dy);
     }
@@ -82,6 +90,18 @@ public class Vector {
         y = py;
     }
 
+    public Vector rotated(double angle) {
+        double theta = Math.toRadians(angle);
+
+        double cs = Math.cos(theta);
+        double sn = Math.sin(theta);
+
+        double px = x * cs - y * sn;
+        double py = x * sn + y * cs;
+
+        return new Vector(px, py);
+    }
+
     public void moveTowards(Vector target, double maxStep) {
         Vector deltaVector = target.subtracted(this).normalized();
         this.add(deltaVector.multiplied(maxStep));
@@ -89,6 +109,13 @@ public class Vector {
 
     public double toAngle() {
         return Math.toDegrees(Math.atan2(y, x));
+    }
+
+    public static double dot(Vector v1, Vector v2) {
+        Vector vn1 = v1.normalized();
+        Vector vn2 = v2.normalized();
+
+        return vn1.x * vn2.x + vn1.y * vn2.y;
     }
 
     public Vector copy() {

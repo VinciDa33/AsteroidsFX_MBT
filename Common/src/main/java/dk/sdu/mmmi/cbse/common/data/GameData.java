@@ -10,8 +10,7 @@ public class GameData {
 
     private long delta;
     private double deltaSec;
-
-
+    private double time;
     public GameKeys getKeys() {
         return keys;
     }
@@ -26,11 +25,15 @@ public class GameData {
     public void setDelta(long delta) {
         this.delta = delta;
         this.deltaSec = delta * 0.001f;
+        this.time += deltaSec;
     }
     public long getDelta() {
         return delta;
     }
     public double getDeltaSec() {
         return deltaSec;
+    }
+    public double getTime() {
+        return time;
     }
 }
