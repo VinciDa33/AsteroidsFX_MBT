@@ -98,7 +98,7 @@ public class AsteroidFactory {
                 try {
                     client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getStackTrace());
                 }
 
                 AsteroidSplitter.instance().splitAsteroid(gameData, asteroid);

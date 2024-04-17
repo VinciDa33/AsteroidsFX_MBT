@@ -18,10 +18,10 @@ public class EnemyFactory {
         //Rendering
         RenderingSegment renderer = new RenderingSegment();
         renderer.setPolygonCoordinates(
-                11, 0,
-                -8, -7,
-                -6, 0,
-                -8, 7
+                12, 0,
+                -7, -8,
+                -5, 0,
+                -7, 8
         );
         renderer.setColor(240, 100, 80);
         enemyShip.addSegment(renderer);
@@ -50,7 +50,7 @@ public class EnemyFactory {
                 try {
                     client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getStackTrace());
                 }
 
                 world.removeEntity(enemyShip);

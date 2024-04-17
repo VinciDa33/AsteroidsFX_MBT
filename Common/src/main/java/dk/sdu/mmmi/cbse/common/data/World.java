@@ -55,5 +55,4 @@ public class World {
     public Entity getEntity(String ID) {
         return entityMap.get(ID);
     }
-
 }

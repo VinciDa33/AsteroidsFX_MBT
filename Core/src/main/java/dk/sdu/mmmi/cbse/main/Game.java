@@ -182,7 +182,7 @@ public class Game {
 
             scoreValue = Integer.parseInt(responseBody);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getStackTrace());
         }
 
         scoreText.setText("Score: " + (scoreValue == -1 ? "Score not found!" : scoreValue));

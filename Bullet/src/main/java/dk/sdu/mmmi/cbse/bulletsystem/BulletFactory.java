@@ -19,9 +19,9 @@ public class BulletFactory implements BulletSPI {
         RenderingSegment shooterRenderer = shooter.getSegment(RenderingSegment.class);
 
 
-        Entity bullet = new Bullet();
+        Bullet bullet = new Bullet();
         bullet.setTag(EntityTag.BULLET);
-        ((Bullet) bullet).setShooter(shooter);
+        bullet.setShooter(shooter);
 
         //Rendering
         RenderingSegment renderer = new RenderingSegment();
@@ -50,7 +50,7 @@ public class BulletFactory implements BulletSPI {
             @Override
             public void onCollision(Entity other) {
                 //If the player was the shooter of this bullet, it will not kill the player
-                if (((Bullet) bullet).getShooter().getTag() == EntityTag.PLAYER)
+                if (bullet.getShooter().getTag() == EntityTag.PLAYER)
                     return;
 
                 world.removeEntity(other);
@@ -80,7 +80,7 @@ public class BulletFactory implements BulletSPI {
                 try {
                     client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getStackTrace());
                 }
 
                 //gameData.addScore(500);
