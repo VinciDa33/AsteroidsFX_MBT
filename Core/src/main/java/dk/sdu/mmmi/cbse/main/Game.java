@@ -44,6 +44,9 @@ public class Game {
     private final Text scoreText = new Text("Score: 0");
     private final Text timeText = new Text("Time:" + 0);
 
+    private final double fetchScoreCooldown = 0.2d;
+    private double fetchScoreTimer = 0d;
+
     public Game(List<IGamePluginService> gamePluginServices, List<IEntityProcessingService> entityProcessingServiceList, List<IPostEntityProcessingService> postEntityProcessingServices) {
         this.gamePluginServices = gamePluginServices;
         this.entityProcessingServices = entityProcessingServiceList;
@@ -157,6 +160,14 @@ public class Game {
         if (world.getEntitiesWithTag(EntityTag.PLAYER).isEmpty())
             return;
 
+        //Limit how often an HTTP request is send
+        if (fetchScoreTimer < fetchScoreCooldown) {
+            fetchScoreTimer += gameData.getDeltaSec();
+            return;
+        }
+
+        fetchScoreTimer -= fetchScoreCooldown;
+
         String url = String.format("http://localhost:6060/get");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -174,7 +185,7 @@ public class Game {
             e.printStackTrace();
         }
 
-        scoreText.setText("Score: " + scoreValue);
+        scoreText.setText("Score: " + (scoreValue == -1 ? "Score not found!" : scoreValue));
         timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
     }
 
