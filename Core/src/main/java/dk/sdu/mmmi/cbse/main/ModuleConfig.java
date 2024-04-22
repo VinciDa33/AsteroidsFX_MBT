@@ -15,21 +15,25 @@ public class ModuleConfig {
     public ModuleConfig() {
     }
 
+    //Bean for obtaining a Game object, with dependencies injected
     @Bean(name="GameBean")
     public Game game(){
         return new Game(gamePluginServices(), entityProcessingServices(), postEntityProcessingServices());
     }
 
+    //Bean for getting a collection of all entity processing services
     @Bean(name="EntityProcessingBean")
     public List<IEntityProcessingService> entityProcessingServices(){
         return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
+    //Bean for getting a collection of all game plugin services
     @Bean(name="GamePluginBean")
     public List<IGamePluginService> gamePluginServices() {
         return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 
+    //Bean for getting a collection of all post entity processing services
     @Bean(name="PostEntityProcessingBean")
     public List<IPostEntityProcessingService> postEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());

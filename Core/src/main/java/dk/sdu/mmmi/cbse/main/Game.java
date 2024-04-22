@@ -47,28 +47,44 @@ public class Game {
     private final double fetchScoreCooldown = 0.2d;
     private double fetchScoreTimer = 0d;
 
+    /**
+     * Constructor with enforced constructor injection
+     * @param gamePluginServices
+     * @param entityProcessingServiceList
+     * @param postEntityProcessingServices
+     */
     public Game(List<IGamePluginService> gamePluginServices, List<IEntityProcessingService> entityProcessingServiceList, List<IPostEntityProcessingService> postEntityProcessingServices) {
         this.gamePluginServices = gamePluginServices;
         this.entityProcessingServices = entityProcessingServiceList;
         this.postEntityProcessingServices = postEntityProcessingServices;
     }
 
+
+    /**
+     * Game start method. Should be run only once, when the game is started
+     * @param window
+     * @throws Exception
+     */
     public void start(Stage window) throws Exception {
+        //Set window size and background color
         gameWindow.setPrefSize(gameData.getDisplaySize().x, gameData.getDisplaySize().y);
         gameWindow.setStyle("-fx-background-color: #1e1e1e"); //Set background color
 
+        //Setup text element for displaying the score
         scoreText.setX(20);
         scoreText.setY(40);
         scoreText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 24));
         scoreText.setFill(new Color(1f, 1f, 1f, 1f));
         gameWindow.getChildren().add(scoreText);
 
+        //Setup text element for displaying the game time
         timeText.setX(gameData.getDisplaySize().x - 180);
         timeText.setY(40);
         timeText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 24));
         timeText.setFill(new Color(1f, 1f, 1f, 1f));
         gameWindow.getChildren().add(timeText);
 
+        //Setup keyboard input listeners for relevant keys
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
             if (event.getCode().equals(KeyCode.LEFT)) {
@@ -100,12 +116,12 @@ public class Game {
 
         });
 
-        // Lookup all Game Plugins using ServiceLoader
+        //Loop over all IGamePluginService's and execute their start methods
         for (IGamePluginService iGamePlugin : gamePluginServices) {
             iGamePlugin.start(gameData, world);
         }
 
-        //Reset the score on game relaunch
+        //Reset the score on game relaunch (Relevant since the score is stored in a separate Spring Boot application)
         String url = String.format("http://localhost:6060/reset");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -118,30 +134,45 @@ public class Game {
             e.printStackTrace();
         }
 
-
+        //Start the render method
         render();
 
+        //Enable the application window using the scene containing the gameWindow
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
         window.show();
 
     }
 
+    /**
+     * Starts the main loop for the application
+     */
     private void render() {
+        //Create and start animation timer as main game loop
         new AnimationTimer() {
             private long then = System.nanoTime();
             @Override
             public void handle(long now) {
+
+                //Calculate the time between this and the previous frame (In milliseconds)
                 long deltaTime = (now - then) / 1000000;
                 then = now;
+
+                //Run the update and draw methods
                 update(deltaTime);
                 draw();
+
+                //Update the game keys
                 gameData.getKeys().update();
             }
 
         }.start();
     }
 
+    /**
+     * Handles the general game code and running of different modules
+     * @param delta
+     */
     private void update(long delta) {
         //Update delta time
         gameData.setDelta(delta);
@@ -154,6 +185,7 @@ public class Game {
             postEntityProcessorService.process(gameData, world);
         }
 
+        //Run the garbage collector to remove no longer needed polygons
         garbageCollect();
 
         //Stop updating the score and time if no player is present
@@ -165,15 +197,16 @@ public class Game {
             fetchScoreTimer += gameData.getDeltaSec();
             return;
         }
-
         fetchScoreTimer -= fetchScoreCooldown;
 
+        //Retrieve the score from the scoring microservice.
         String url = String.format("http://localhost:6060/get");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
 
+        //Default value in case the endpoint is not found
         int scoreValue = -1;
 
         try {
@@ -185,24 +218,30 @@ public class Game {
             System.out.println(e.getStackTrace());
         }
 
+        //Update text labels
         scoreText.setText("Score: " + (scoreValue == -1 ? "Score not found!" : scoreValue));
         timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
     }
 
     /**
+     * Handles the graphical logic of adding and removing polygons.
      * Entity must contain a RenderingSegment and a TransformSegment for the entity
      * polygon to be rendered.
      */
     private void draw() {
+        //Run for every entity in the world object
         for (Entity entity : world.getEntities()) {
+            //Check if needed segments are present
             if (!entity.hasSegment(RenderingSegment.class))
                 continue;
             if (!entity.hasSegment(TransformSegment.class))
                 continue;
 
+            //Get the relevant entity segments
             RenderingSegment render = entity.getSegment(RenderingSegment.class);
             TransformSegment transform = entity.getSegment(TransformSegment.class);
 
+            //Check if entity already has a polygon, if not create one and add it
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
                 polygon = new Polygon(render.getPolygonCoordinates());
@@ -210,27 +249,40 @@ public class Game {
                 gameWindow.getChildren().add(polygon);
             }
 
+            //Update polygon position and rotation
             polygon.setTranslateX(transform.getPosition().x);
             polygon.setTranslateY(transform.getPosition().y);
             polygon.setRotate(transform.getRotation());
 
+            //Update polygon color
             int[] color = render.getColor();
             polygon.setFill(javafx.scene.paint.Color.rgb(color[0], color[1], color[2]));
 
+            //If visible colliders are enabled, run the draw colliders method
             if (showColliders)
                 drawColliders(entity);
         }
     }
 
+
+    /**
+     * Checks weather a polygon no longer maps to an entity within the world object.
+     * If a polygon no longer has an entity, it is removed from all relevant maps.
+     */
     public void garbageCollect() {
+        //List of entities ready for deletion
         List<Entity> toDelete = new ArrayList<>();
 
+        //Loop over all entity keys in the polygons keyset. If a key does not exist in the
+        //world object, add it for deletion
+        //(Objects are not deleted immediately to ensure no deletion happens during iteration)
         for (Entity key : polygons.keySet()) {
             if (world.getEntity(key.getID()) == null) {
                 toDelete.add(key);
             }
         }
 
+        //Delete all polygons listed
         for (Entity e : toDelete) {
             gameWindow.getChildren().remove(polygons.get(e));
             gameWindow.getChildren().remove(colliders.get(e));
@@ -240,18 +292,21 @@ public class Game {
     }
 
     /**
-     * @param entity
      * Entity must contain a CircleColliderSegment in addition to the needs of the standard rendering in
      * order for its collider to be rendered.
      * The check for a TransformSegment is done in the standard draw method.
+     * @param entity
      */
     private void drawColliders(Entity entity) {
+        //Check if needed segment is present
         if (!entity.hasSegment(CircleColliderSegment.class))
             return;
 
+        //Get relevant segments
         CircleColliderSegment collider = entity.getSegment(CircleColliderSegment.class);
         TransformSegment transform = entity.getSegment(TransformSegment.class);
 
+        //Check if entity already has a collision circle, if not create one and add it
         Circle colliderGizmo = colliders.get(entity);
         if (colliderGizmo == null) {
             colliderGizmo = new Circle(0, 0, collider.getRadius());
@@ -260,6 +315,7 @@ public class Game {
             gameWindow.getChildren().add(colliderGizmo);
         }
 
+        //Update collision circle position
         colliderGizmo.setTranslateX(transform.getPosition().x);
         colliderGizmo.setTranslateY(transform.getPosition().y);
     }
