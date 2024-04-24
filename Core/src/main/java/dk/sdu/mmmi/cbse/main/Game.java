@@ -192,6 +192,9 @@ public class Game {
         if (world.getEntitiesWithTag(EntityTag.PLAYER).isEmpty())
             return;
 
+        //Update time label
+        timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
+
         //Limit how often an HTTP request is send
         if (fetchScoreTimer < fetchScoreCooldown) {
             fetchScoreTimer += gameData.getDeltaSec();
@@ -220,7 +223,6 @@ public class Game {
 
         //Update text labels
         scoreText.setText("Score: " + (scoreValue == -1 ? "Score not found!" : scoreValue));
-        timeText.setText("Time: " + ((int)(gameData.getTime() * 10f)) / 10f);
     }
 
     /**
