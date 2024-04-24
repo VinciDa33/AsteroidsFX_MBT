@@ -10,8 +10,11 @@ import dk.sdu.mmmi.cbse.common.data.World;
  */
 public interface IEntityProcessingService {
     /**
-     * @param gameData, cannot be null
-     * @param world, cannot be null
+     * @param gameData
+     * @param world
+     *
+     * Pre-condition: gameData cannot be null, world cannot be null
+     * Post-condition: The class implementing this interface has run its implementation of the process method
      */
     void process(GameData gameData, World world);
 }
