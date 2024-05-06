@@ -1,6 +1,5 @@
 module Core {
     requires Common;
-    requires CommonBullet;
 
     requires javafx.graphics;
 
