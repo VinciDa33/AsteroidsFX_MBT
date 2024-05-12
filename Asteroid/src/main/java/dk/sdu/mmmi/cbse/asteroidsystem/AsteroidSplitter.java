@@ -25,12 +25,13 @@ public class AsteroidSplitter {
     }
 
     public void splitAsteroid(GameData gameData, Asteroid asteroid) {
+        if (world == null)
+            return;
+
         world.removeEntity(asteroid);
 
         //Do not split if asteroid is already the smallest size
         if (asteroid.getAsteroidSize() <= 1)
-            return;
-        if (world == null)
             return;
 
         RigidbodySegment rigidbody = asteroid.getSegment(RigidbodySegment.class);
